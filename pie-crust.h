@@ -1,6 +1,11 @@
+#define _GNU_SOURCE
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/syscall.h>
 #include </usr/include/linux/ptrace.h>
 #include </usr/include/libelf.h>
 #include <stdio.h>
+#include <getopt.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <limits.h>
