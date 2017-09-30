@@ -78,6 +78,15 @@ int get_and_check_options(int argc, char **argv)
 			ccode = -1;
 		}
 	}
+	/* validate some combinations */
+	if (long_options[OPT_ATTACH].val == 1 &&
+		(long_options[OPT_STOP].val == 1 ||
+		 long_options[OPT_MAP].val == 1)) {
+		printf ("Can not use 'attach', 'stop', or 'map' options together\n");
+		usage(argv[0]);
+		ccode = -1;
+	}
+	
 	return ccode;
 }
 
