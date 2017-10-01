@@ -1,4 +1,9 @@
-
+/*****************************************************
+ *
+ * copyright Michael D. Day 2017
+ * made available under the GNU GPL, v2
+ *
+ ****************************************************/
 #include "pie-crust.h"
 
 
