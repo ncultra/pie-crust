@@ -1,7 +1,13 @@
 .PHONY: all
 all: pie_crust
-pie_crust: pie-crust.c pie-crust.h 
-	gcc -Wall -g -o  $@ $<
+pie_crust: pie-crust.o pmparser.o
+	gcc  -o $@ $^
+
+pie-crust.o: pie-crust.c pie-crust.h 
+	gcc -Wall -g -c $<
+
+pmparser.o: pmparser.c pmparser.h
+	gcc -Wall -g -c $<
 
 .PHONY: clean
 clean:
