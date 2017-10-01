@@ -51,6 +51,43 @@ errout:
 		return ccode;	
 }
 
+/* [heap] */
+uintptr_t map_after_heap(char *backing, int hole)
+{
+
+	procmaps_struct *iter = NULL;
+	uintptr_t map_start = 0L;
+	procmaps_struct *maps = pmparser_parse(getpid ());
+
+	if (maps == NULL)
+    {
+		printf("unable to parse /proc/maps");
+		return map_start;
+    }
+
+	while ((iter = pmparser_next ()) != NULL)
+    {
+		/* look for heap mapping */
+		if (iter->pathname)
+		{
+			char *pos = strstr (iter->pathname, backing);
+			if (pos != NULL && strlen (pos) > 0)
+			{
+				/* grab the ending address, add a hole, 
+				 * return the result */
+				map_start = (uintptr_t) iter->addr_end + hole;
+				goto out;
+			}
+		}
+    }
+out:
+	if (maps != NULL)
+    {
+		pmparser_free (maps);
+    }
+	return map_start;
+}
+
 
 
 
@@ -58,12 +95,14 @@ errout:
 #define OPT_ATTACH        1
 #define OPT_STOP          2
 #define OPT_MAP           3
-#define OPT_VERBOSE       4
+#define OPT_HIJACK        4
+#define OPT_VERBOSE       5
 static struct option long_options[] = {
     {"pid", required_argument, 0, 0 },
 	{"attach", no_argument, 0, 0 },
 	{"stop", no_argument, 0, 0 },
 	{"map", optional_argument, 0, 0 },
+	{"hijack", required_argument, 0, 0 },
 	{"verbose", no_argument, 0, 0 },
     {0, 0, 0, 0 }
 };
@@ -76,6 +115,7 @@ static void usage(char *program)
 	printf("\t--attach attach to the program <pid> \n");
 	printf("\t--stop  stop the program <pid>\n");
 	printf("\t--map map memory into the program <pid>\n");
+	printf("\t--hijack overwrite <function> of <pid> with my version\n");
 	printf("\t--verbose display extra information when available\n");	
 }
 
