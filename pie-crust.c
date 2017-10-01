@@ -72,7 +72,7 @@ uintptr_t map_after_heap(char *backing, int hole)
 
 	while ((iter = pmparser_next ()) != NULL)
     {
-		/* look for heap mapping */
+		/* look for backing */
 		if (iter->pathname)
 		{
 			char *pos = strstr (iter->pathname, backing);
@@ -175,19 +175,6 @@ int get_and_check_options(int argc, char **argv)
 			usage(argv[0]);
 			ccode = -1;
 		}
-	}
-	
-	/* validate some few combinations that may occur by mistake
-	 * rewrite this to make a pass starting to validate each 
-     * cmd index AND (next or next + 1)
-	 */
-
-	if (long_options[OPT_ATTACH].val == 1 &&
-		(long_options[OPT_STOP].val == 1 ||
-		 long_options[OPT_MAP].val == 1)) {
-		printf ("Can not use 'attach', 'stop', or 'map' options together\n");
-		usage(argv[0]);
-		ccode = -1;
 	}
 	
 	return ccode;
