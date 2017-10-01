@@ -2,7 +2,7 @@
 #include "pie-crust.h"
 
 
-int __pt_seize(pid_t pid) 
+static pid_t __pt_seize(pid_t pid) 
 {
 	int ccode = 0;
 	
@@ -14,7 +14,7 @@ int __pt_seize(pid_t pid)
 }
 
 
-pid_t __pt_wait(pid_t child) 
+static pid_t __pt_wait(pid_t child) 
 {
 	int status;
 	pid_t pid = waitpid(child, &status, WCONTINUED | WUNTRACED);
@@ -131,7 +131,12 @@ int get_and_check_options(int argc, char **argv)
 			ccode = -1;
 		}
 	}
-	/* validate some few combinations that may occur by mistake*/
+	
+	/* validate some few combinations that may occur by mistake
+	 * rewrite this to make a pass starting to validate each 
+     * cmd index AND (next or next + 1)
+	 */
+
 	if (long_options[OPT_ATTACH].val == 1 &&
 		(long_options[OPT_STOP].val == 1 ||
 		 long_options[OPT_MAP].val == 1)) {
