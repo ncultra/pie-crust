@@ -1,4 +1,57 @@
+
 #include "pie-crust.h"
+
+
+int __pt_seize(pid_t pid) 
+{
+	int ccode = 0;
+	
+	ccode = ptrace(PTRACE_SEIZE, pid, NULL, NULL);
+	if (ccode) {
+		perror("ptrace seize ");
+	}
+	return ccode;
+}
+
+
+pid_t __pt_wait(pid_t child) 
+{
+	int status;
+	pid_t pid = waitpid(child, &status, WCONTINUED | WUNTRACED);
+	if (pid == -1) {
+		perror("waitpid");
+		goto err_out;
+	}
+
+	if (WIFEXITED(status)) {
+		printf("exited, status=%d\n", WEXITSTATUS(status));
+	} else if (WIFSIGNALED(status)) {
+		printf("killed by signal %d\n", WTERMSIG(status));
+	} else if (WIFSTOPPED(status)) {
+		printf("stopped by signal %d\n", WSTOPSIG(status));
+	} else if (WIFCONTINUED(status)) {
+		printf("continued\n");
+	}
+
+err_out:
+	return pid;
+}
+
+int seize_and_wait(pid_t pid) 
+{
+	int ccode = __pt_seize(pid);
+	if (ccode) {
+		perror("seize_and_wait ");
+		goto errout;
+	}
+
+	ccode = __pt_wait(pid);
+	
+errout:
+		return ccode;	
+}
+
+
 
 
 #define OPT_PID           0
@@ -78,7 +131,7 @@ int get_and_check_options(int argc, char **argv)
 			ccode = -1;
 		}
 	}
-	/* validate some combinations */
+	/* validate some few combinations that may occur by mistake*/
 	if (long_options[OPT_ATTACH].val == 1 &&
 		(long_options[OPT_STOP].val == 1 ||
 		 long_options[OPT_MAP].val == 1)) {
@@ -92,8 +145,9 @@ int get_and_check_options(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-	int ccode;
-	
-	ccode = get_and_check_options(argc, argv);
+	int ccode = get_and_check_options(argc, argv);
+	pid_t tracee =  long_options[OPT_PID].val;
+	ccode = seize_and_wait(tracee);
+
 	return ccode;
 }
