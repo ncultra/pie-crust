@@ -1,6 +1,11 @@
 #!/bin/bash
 
-# tbase.sh pid (or none for self)
+# tbase.sh pid
+#
+# copyright Michael D. Day 2017
+# made available under the GNU GPL, v2
+
+
 
 PID=self
 PROGRAM=$0
